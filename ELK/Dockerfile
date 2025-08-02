@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y curl && \
     curl -L -o /elastic-apm-agent.jar https://search.maven.org/remotecontent?filepath=co/elastic/apm/elastic-apm-agent/${APM_VERSION}/elastic-apm-agent-${APM_VERSION}.jar
 
 # Copie du .war dans le dossier webapps
-COPY ../target/tasksManagement-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
+COPY tasksManagement-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/
 
 # Injecte l'agent au démarrage
 ENV CATALINA_OPTS="-javaagent:/elastic-apm-agent.jar \
