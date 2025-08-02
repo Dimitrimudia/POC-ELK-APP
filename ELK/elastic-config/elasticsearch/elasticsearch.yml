@@ -1,0 +1,9 @@
+# Active la sécurité (authentification, TLS transport)
+xpack.security.enabled: true
+xpack.security.transport.ssl.enabled: true
+
+# Paramètre pour un noeud unique (mode dev)
+discovery.type: single-node
+
+# (Optionnel) Ajuste la mémoire JVM, mais tu peux gérer via variables d'env
+# ES_JAVA_OPTS: -Xms1g -Xmx1g

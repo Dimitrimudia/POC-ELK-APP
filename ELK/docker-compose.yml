@@ -1,29 +1,47 @@
 services:
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.13.3
+    container_name: elasticsearch
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=ChangeMe123!   # CHANGE CE MOT DE PASSE !
+      - "ES_JAVA_OPTS=-Xms1g -Xmx1g"
+    volumes:
+      - ./elastic-config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml:ro
+      - esdata:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
+      - "9300:9300"
 
   kibana:
     image: docker.elastic.co/kibana/kibana:8.13.3
+    container_name: kibana
+    depends_on:
+      - elasticsearch
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - xpack.security.enabled=false
+      - ELASTICSEARCH_USERNAME=elastic
+      - ELASTICSEARCH_PASSWORD=ChangeMe123!   # MATCH ELASTIC_PASSWORD
+      - XPACK_SECURITY_ENABLED=true
+    volumes:
+      - ./elastic-config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml:ro
     ports:
       - "5601:5601"
 
   apm-server:
     image: docker.elastic.co/apm/apm-server:8.13.3
+    container_name: apm-server
     depends_on:
       - elasticsearch
     environment:
       - output.elasticsearch.hosts=["http://elasticsearch:9200"]
       - apm-server.host=0.0.0.0:8200
-      - apm-server.auth.anonymous.enabled=true
-      - xpack.security.enabled=false
+      - setup.kibana.host=http://kibana:5601
+      - setup.kibana.username=elastic
+      - setup.kibana.password=ChangeMe123!
+      - apm-server.auth.anonymous.enabled=false
+      - xpack.security.enabled=true
     ports:
       - "8200:8200"
 
@@ -33,3 +51,6 @@ services:
       - "8080:8080"
     depends_on:
       - apm-server
+
+volumes:
+  esdata:
