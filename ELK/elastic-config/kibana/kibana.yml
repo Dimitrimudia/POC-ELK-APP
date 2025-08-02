@@ -2,8 +2,10 @@
 server.host: "0.0.0.0"
 
 # Infos de connexion à Elasticsearch (identiques au mot de passe défini)
-elasticsearch.username: "elastic"
-elasticsearch.password: "ChangeMe123!"   # À modifier pour un mot de passe sécurisé
+#elasticsearch.username: "elastic"
+#elasticsearch.password: "ChangeMe123!"   # À modifier pour un mot de passe sécurisé
+elasticsearch.serviceAccountToken: "eyJ2ZXIiOiIxIiwgInR5cCI6IkJlYXJlciIsICJhbGciOiJIUzI1NiJ9..."
+
 
 # Activation des fonctionnalités xpack
-xpack.security.enabled: true
+#xpack.security.enabled: true
