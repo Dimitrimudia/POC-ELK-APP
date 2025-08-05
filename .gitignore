@@ -3,9 +3,9 @@ target/
 .mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
-!**/elasticsearch-data/
-!**/postgres-data/
-!**/elastic-agent-data/
+ELK/elasticsearch-data/
+ELK/postgres-data/
+ELK/elastic-agent-data/
 
 ### STS ###
 .apt_generated
