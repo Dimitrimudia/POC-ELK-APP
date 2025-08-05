@@ -1,27 +1,29 @@
 services:
-
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.3
+    image: docker.elastic.co/elasticsearch/elasticsearch:${STACK_VERSION}
     container_name: elasticsearch
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=true
-      - ELASTIC_PASSWORD=Ruskov@75!
+      - ELASTIC_PASSWORD=${ELASTIC_PASSWORD}
       - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - ./elastic-config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch-data:/usr/share/elasticsearch/data
     ports:
       - "9200:9200"
     networks:
       - elk
 
   kibana:
-    image: docker.elastic.co/kibana/kibana:8.13.3
+    image: docker.elastic.co/kibana/kibana:${STACK_VERSION}
     container_name: kibana
     environment:
       - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
-      - ELASTICSEARCH_USERNAME=kibana_user
-      - ELASTICSEARCH_PASSWORD=Kibana123!
-      - xpack.security.enabled=true
-
+      - ELASTICSEARCH_USERNAME=kibana
+      - ELASTICSEARCH_PASSWORD=${KIBANA_PASSWORD}
+    volumes:
+      - ./elastic-config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
     ports:
       - "5601:5601"
     depends_on:
@@ -30,11 +32,13 @@ services:
       - elk
 
   apm-server:
-    image: docker.elastic.co/apm/apm-server:8.13.3
+    image: docker.elastic.co/apm/apm-server:${STACK_VERSION}
     container_name: apm-server
     depends_on:
       - elasticsearch
       - kibana
+    volumes:
+      - ./elastic-config/apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml
     environment:
       - output.elasticsearch.hosts=["http://elasticsearch:9200"]
       - apm-server.host=0.0.0.0:8200
@@ -48,11 +52,13 @@ services:
     image: postgres:15
     container_name: postgres
     environment:
-      POSTGRES_USER: myroot
-      POSTGRES_PASSWORD: 123456789*
-      POSTGRES_DB: taskdb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
     networks:
       - backend
 
@@ -63,15 +69,40 @@ services:
       - db
       - apm-server
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskdb
-      SPRING_DATASOURCE_USERNAME: myroot
-      SPRING_DATASOURCE_PASSWORD: 123456789*
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - "8080:8080"
     networks:
       - backend
       - elk
 
+  elastic-agent:
+    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    container_name: elastic-agent
+    depends_on:
+      - elasticsearch
+      - kibana
+    environment:
+      - FLEET_ENROLL=1
+      - FLEET_URL=http://kibana:5601
+      - FLEET_ENROLLMENT_TOKEN=${FLEET_ENROLLMENT_TOKEN}
+      - ELASTICSEARCH_HOST=http://elasticsearch:9200
+      - KIBANA_HOST=http://kibana:5601
+    privileged: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - ./elastic-agent-data:/usr/share/elastic-agent/data
+    networks:
+      - elk
+
 networks:
   elk:
   backend:
+
+volumes:
+  elasticsearch-data:
+  postgres-data:
+  elastic-agent-data:

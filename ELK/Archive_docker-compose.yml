@@ -1,0 +1,87 @@
+services:
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.3
+    container_name: elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=true
+      - ELASTIC_PASSWORD=1QSpRG2eptu0lCAZUEaP
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g
+    volumes:
+      - ./elastic-config/elasticsearch/elasticsearch.yml:/usr/share/elasticsearch/config/elasticsearch.yml
+      - ./elasticsearch-data:/usr/share/elasticsearch/data
+    ports:
+      - "9200:9200"
+    networks:
+      - elk
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.13.3
+    container_name: kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - ELASTICSEARCH_USERNAME=kibana
+      - ELASTICSEARCH_PASSWORD=MGNpxB_zG8lFh0jQP2SU
+  
+    volumes:
+      - ./elastic-config/kibana/kibana.yml:/usr/share/kibana/config/kibana.yml
+
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+
+  apm-server:
+    image: docker.elastic.co/apm/apm-server:8.13.3
+    container_name: apm-server
+    depends_on:
+      - elasticsearch
+      - kibana
+    volumes:
+    - ./elastic-config/apm-server/apm-server.yml:/usr/share/apm-server/apm-server.yml
+    environment:
+      - output.elasticsearch.hosts=["http://elasticsearch:9200"]
+      - apm-server.host=0.0.0.0:8200
+      - apm-server.auth.anonymous.enabled=true
+    ports:
+      - "8200:8200"
+    networks:
+      - elk
+
+  db:
+    image: postgres:15
+    container_name: postgres
+    environment:
+      POSTGRES_USER: myroot
+      POSTGRES_PASSWORD: 123456789*
+      POSTGRES_DB: taskdb
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+  tomcat:
+    build: .
+    container_name: tomcat-app
+    depends_on:
+      - db
+      - apm-server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskdb
+      SPRING_DATASOURCE_USERNAME: myroot
+      SPRING_DATASOURCE_PASSWORD: 123456789*
+    ports:
+      - "8080:8080"
+    networks:
+      - backend
+      - elk
+
+networks:
+  elk:
+  backend:
+
+volumes:
+  elasticsearch-data:

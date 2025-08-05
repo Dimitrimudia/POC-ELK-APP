@@ -1,0 +1,12 @@
+apm-server:
+  host: "0.0.0.0:8200"
+
+output.elasticsearch:
+  hosts: ["http://elasticsearch:9200"]
+  username: "apm_user"
+  password: "123456789*!"   # Mets ici le mot de passe de apm_user
+
+setup.kibana:
+  host: "http://kibana:5601"
+  username: "kibana"
+  password: "MGNpxB_zG8lFh0jQP2SU"  # Mets ici le mot de passe de kibana_user

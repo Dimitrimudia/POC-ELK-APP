@@ -1,10 +1,15 @@
 # Écoute sur toutes les interfaces réseau (utile pour Docker)
 server.host: "0.0.0.0"
 # Infos de connexion à Elasticsearch (identiques au mot de passe défini)
-elasticsearch.username: "kibana_user"
-elasticsearch.password: "Kibana123!"   # À modifier pour un mot de passe sécurisé
+elasticsearch.username: "kibana"
+elasticsearch.password: "MGNpxB_zG8lFh0jQP2SU"   # À modifier pour un mot de passe sécurisé
 #elasticsearch.serviceAccountToken: "AAEAAWVsYXN0aWMva2liYW5hL2tpYmFuYS10b2tlbjp2bnJ2RUg2clNiaUVKclEzME4xcG1n"
-
+xpack.encryptedSavedObjects.encryptionKey: eff1e070a497af4800fa65cc7f6c3031
+xpack.reporting.encryptionKey: feffc5c53c15250f9b0a0e9c9b530789
+xpack.security.encryptionKey: 8516139e957a2e18eaaa6840a3806be9
 
 # Activation des fonctionnalités xpack
-xpack.security.enabled: true
+xpack.fleet.agents.enabled: true
+xpack.fleet.agents.fleet_server.hosts: ["http://localhost:8220"]
+
+
