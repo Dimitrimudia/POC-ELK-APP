@@ -90,11 +90,14 @@ services:
       - FLEET_ENROLLMENT_TOKEN=${FLEET_ENROLLMENT_TOKEN}
       - ELASTICSEARCH_HOST=http://elasticsearch:9200
       - KIBANA_HOST=http://kibana:5601
+      - ELASTIC_AGENT_FLEET_SERVER_ENABLE=false
+  
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./elastic-agent-data:/usr/share/elastic-agent/data
+      - ./elastic-config/elastic-agent/elastic-agent.yml:/usr/share/elastic-agent/elastic-agent.yml
     networks:
       - elk
 
