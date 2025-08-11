@@ -79,7 +79,7 @@ services:
       - elk
 
   elastic-agent:
-    image: docker.elastic.co/beats/elastic-agent:${STACK_VERSION}
+    image: elastic/elastic-agent:${STACK_VERSION}
     container_name: elastic-agent
     depends_on:
       - elasticsearch

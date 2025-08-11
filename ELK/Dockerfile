@@ -4,6 +4,7 @@ FROM tomcat:10.1-jdk17
 ENV APM_VERSION=1.43.0
 RUN apt-get update && apt-get install -y curl && \
     curl -L -o /elastic-apm-agent.jar https://search.maven.org/remotecontent?filepath=co/elastic/apm/elastic-apm-agent/${APM_VERSION}/elastic-apm-agent-${APM_VERSION}.jar
+RUN mkdir -p /app/logs && chmod -R 777 /app/logs
 
 # Copie du .war dans le dossier webapps
 COPY tasksManagement-0.0.1-SNAPSHOT.war /usr/local/tomcat/webapps/

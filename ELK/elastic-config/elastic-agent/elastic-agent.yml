@@ -1,0 +1,29 @@
+outputs:
+  default:
+    type: elasticsearch
+    hosts: ["http://elasticsearch:9200"]
+    username: "elastic"
+    password: "${ELASTIC_PASSWORD}"
+
+fleet:
+  enabled: true
+  kibana:
+    host: "http://kibana:5601"
+
+inputs:
+  - type: http
+    enabled: true
+    streams:
+      - paths:
+          - /metrics
+        service:
+          name: tomcat-app
+        tags: ["tomcat", "java"]
+
+  - type: postgres
+    enabled: true
+    hosts: ["db:5432"]
+    username: "${POSTGRES_USER}"
+    password: "${POSTGRES_PASSWORD}"
+    database: "${POSTGRES_DB}"
+    tags: ["postgresql"]
