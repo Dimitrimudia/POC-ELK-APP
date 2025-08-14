@@ -79,7 +79,7 @@ services:
       - elk
 
   elastic-agent:
-    image: elastic/elastic-agent:${STACK_VERSION}
+    image: docker.elastic.co/beats/elastic-agent:8.13.3
     container_name: elastic-agent
     depends_on:
       - elasticsearch
@@ -95,9 +95,8 @@ services:
     privileged: true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - /var/lib/docker/containers:/var/lib/docker/containers:ro
       - ./elastic-agent-data:/usr/share/elastic-agent/data
-      - ./elastic-config/elastic-agent/elastic-agent.yml:/usr/share/elastic-agent/elastic-agent.yml
+      - ./elastic-config/elastic-agent/elastic-agent.yml:/usr/share/elastic-agent/config/elastic-agent.yml:ro
     networks:
       - elk
 
